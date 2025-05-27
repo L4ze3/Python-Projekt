@@ -4,15 +4,17 @@ from PIL import Image
 import gui
 
 def upscale(img, scale):
-    scale = 50 
     original_size = img.size  # (width, height)
     new_size = (original_size[0] * scale, original_size[1] * scale)
     img_upscaled = img.resize(new_size, Image.NEAREST)
     return img_upscaled
 
 # generated using 4x4 bitmap as base
+
+# TODO: random colors
+
 grid = np.random.rand(4, 4)
-np.around(grid, 0, grid)
+#np.around(grid, 0, grid)
 grid_flipped = np.flip(grid, 1)
 grid_8x4 = np.concatenate((grid, grid_flipped), axis=1)
 grid_8x4_flipped = np.flip(grid_8x4, 0)
@@ -32,18 +34,22 @@ print(color)
 # Stack grayscale data into 3 channels to make it RGB
 grid_rgb = np.stack([grid_8bit]*3, axis=-1)  # shape: (4, 8, 3)
 
+print(grid_8bit)
+
+# colored bits
+# divide by 255 to get the bit to 1 and multiply by the color rgb code
 grid_colored = np.stack([
-    (grid_8bit * color[0][0] / 255).astype(np.uint8),
-    (grid_8bit * color[0][1] / 255).astype(np.uint8),
-    (grid_8bit * color[0][2] / 255).astype(np.uint8)
+    ((grid_8bit/255) * color[0][0]).astype(np.uint8),
+    ((grid_8bit/255) * color[0][1]).astype(np.uint8),
+    ((grid_8bit/255) * color[0][2]).astype(np.uint8)
 ], axis=-1)
 
 
 #grid_colored = np.stack([np.zeros_like(grid_8bit),  # Red channel
 #                         np.zeros_like(grid_8bit),  # Green channel
-#                         grid_8bit], axis=-1)       # Blue channel
+#                        grid_8bit], axis=-1)       # Blue channel
 
-[np.zeros_like(grid_8bit), np.zeros_like(grid_8bit), grid_8bit]
+#[np.zeros_like(grid_8bit), np.zeros_like(grid_8bit), grid_8bit]
 
 print(grid_colored)
 
