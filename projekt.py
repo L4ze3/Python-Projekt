@@ -10,55 +10,44 @@ def upscale(img, scale):
     return img_upscaled
 
 # generated using 4x4 bitmap as base
+# TODO: random colors, add algorithm to get different patterns
 
-# TODO: random colors
+grayscale = False
 
+# generate image using 2 rotations
 grid = np.random.rand(4, 4)
-#np.around(grid, 0, grid)
-grid_flipped = np.flip(grid, 1)
+
+if not (grayscale):
+    np.around(grid, 0, grid)
+
+grid_flipped = np.flip(grid, 1) # flip horizontal
 grid_8x4 = np.concatenate((grid, grid_flipped), axis=1)
-grid_8x4_flipped = np.flip(grid_8x4, 0)
+grid_8x4_flipped = np.flip(grid_8x4, 0) # flip vertical
 grid_8x8 = np.concatenate((grid_8x4, grid_8x4_flipped), axis=0)
-print(grid_8x8)
 
-print()
-
-# convert grid to 8bit image greyscaled
+# convert grid to 8bit image grayscaled
 grid_8bit = (grid_8x8 * 255).astype(np.uint8)
 img = Image.fromarray(grid_8bit, 'L')
-
 
 color = gui.color_picker()
 print(color)
 
-# Stack grayscale data into 3 channels to make it RGB
-grid_rgb = np.stack([grid_8bit]*3, axis=-1)  # shape: (4, 8, 3)
-
-print(grid_8bit)
-
 # colored bits
 # divide by 255 to get the bit to 1 and multiply by the color rgb code
 grid_colored = np.stack([
-    ((grid_8bit/255) * color[0][0]).astype(np.uint8),
-    ((grid_8bit/255) * color[0][1]).astype(np.uint8),
-    ((grid_8bit/255) * color[0][2]).astype(np.uint8)
+    ((grid_8bit/255) * color[0]).astype(np.uint8),
+    ((grid_8bit/255) * color[1]).astype(np.uint8),
+    ((grid_8bit/255) * color[2]).astype(np.uint8)
 ], axis=-1)
 
-
-#grid_colored = np.stack([np.zeros_like(grid_8bit),  # Red channel
-#                         np.zeros_like(grid_8bit),  # Green channel
-#                        grid_8bit], axis=-1)       # Blue channel
-
-#[np.zeros_like(grid_8bit), np.zeros_like(grid_8bit), grid_8bit]
-
-print(grid_colored)
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 img = upscale(img, 50)
-img.save('grid.png')
-img.show()
+img.save(os.path.join(base_dir, 'grid.png'))
+#img.show()
 
 # Convert to RGB image
 img_colored = Image.fromarray(grid_colored, mode='RGB')
 img_colored = upscale(img_colored, 50)
-img_colored.save("grid_colored_blue.png")
+img_colored.save(os.path.join(base_dir, 'grid_colored.png'))
 img_colored.show()
