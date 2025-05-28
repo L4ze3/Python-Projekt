@@ -1,13 +1,20 @@
-import tkinter as tk
-from tkinter import colorchooser
+import customtkinter as ctk
+from CTkColorPicker import *
+
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("dark-blue")
 
 def color_picker():
-    root = tk.Tk()
+    root = ctk.CTk()
     root.withdraw()
 
-    color_code = colorchooser.askcolor(title="Choose a color")
+    ask_color = AskColor(title="Choose a color")
+    hex_color = ask_color.get().lstrip('#')
     root.destroy()
 
-    if color_code and color_code[1]:
-        return color_code  
+    rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4)) # convert hex to rgb
+
+    if rgb :
+        return rgb  
     return None
+
