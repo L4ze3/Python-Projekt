@@ -5,16 +5,11 @@ ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
 def color_picker():
-    root = ctk.CTk()
-    root.withdraw()
-
     ask_color = AskColor(title="Choose a color")
     hex_color = ask_color.get().lstrip('#')
-    root.destroy()
-
     rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4)) # convert hex to rgb
 
-    if rgb :
+    if rgb:
         return rgb  
     return None
 

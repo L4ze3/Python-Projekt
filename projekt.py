@@ -3,30 +3,48 @@ import numpy as np
 from PIL import Image
 import gui
 
+# TODO: random colors, custom randomness, gui flag, cli interface, convert to ascii
+
 def upscale(img, scale):
     original_size = img.size  # (width, height)
     new_size = (original_size[0] * scale, original_size[1] * scale)
     img_upscaled = img.resize(new_size, Image.NEAREST)
     return img_upscaled
 
-# generated using 4x4 bitmap as base
-# TODO: random colors, add algorithm to get different patterns
+def radial():
+    quad = np.random.rand(4, 4)
+    top_half = np.concatenate((quad, np.flip(quad, axis=1)), axis=1)
+    bottom_half = np.flip(top_half, axis=0)
+    grid = np.concatenate((top_half, bottom_half), axis=0)
+    return grid
+
+def vertical():
+    right_half = np.random.rand(8, 4)
+    left_half = np.flip(right_half, axis=1)
+    grid = np.concatenate((right_half, left_half), axis=1)
+    return grid
+
+def horizontal():
+    top_half = np.random.rand(4, 8)
+    bottom_half = np.flip(right_half, axis=0)
+    grid = np.concatenate((top_half, bottom_half), axis=0)
+    return grid
+
+def alien():
+    right_half = np.random.rand(8, 4)
+    right_half[3, 2] = 0
+    left_half = np.flip(right_half, axis=1)
+    grid = np.concatenate((right_half, left_half), axis=1)
+    return grid
 
 grayscale = False
-
-# generate image using 2 rotations
-grid = np.random.rand(4, 4)
+grid = alien()
 
 if not (grayscale):
     np.around(grid, 0, grid)
 
-grid_flipped = np.flip(grid, 1) # flip horizontal
-grid_8x4 = np.concatenate((grid, grid_flipped), axis=1)
-grid_8x4_flipped = np.flip(grid_8x4, 0) # flip vertical
-grid_8x8 = np.concatenate((grid_8x4, grid_8x4_flipped), axis=0)
-
 # convert grid to 8bit image grayscaled
-grid_8bit = (grid_8x8 * 255).astype(np.uint8)
+grid_8bit = (grid * 255).astype(np.uint8)
 img = Image.fromarray(grid_8bit, 'L')
 
 color = gui.color_picker()
@@ -41,10 +59,6 @@ grid_colored = np.stack([
 ], axis=-1)
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
-
-img = upscale(img, 50)
-img.save(os.path.join(base_dir, 'grid.png'))
-#img.show()
 
 # Convert to RGB image
 img_colored = Image.fromarray(grid_colored, mode='RGB')
