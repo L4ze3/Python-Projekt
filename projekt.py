@@ -1,7 +1,9 @@
 import os
+import argparse
 import numpy as np
 from PIL import Image
 import gui
+
 
 # TODO: random colors, custom randomness, gui flag, cli interface, convert to ascii
 
@@ -26,7 +28,7 @@ def vertical():
 
 def horizontal():
     top_half = np.random.rand(4, 8)
-    bottom_half = np.flip(right_half, axis=0)
+    bottom_half = np.flip(top_half, axis=0)
     grid = np.concatenate((top_half, bottom_half), axis=0)
     return grid
 
@@ -37,10 +39,29 @@ def alien():
     grid = np.concatenate((right_half, left_half), axis=1)
     return grid
 
-grayscale = False
-grid = alien()
+parser = argparse.ArgumentParser(
+        prog='Projekt',
+        description='Generate symmetrical 8-Bit Images',
+        )
 
-if not (grayscale):
+parser.add_argument('-g', '--grayscale', action='store_true')
+parser.add_argument('-p', '--pattern', help='{horizontal, vertical, radial, alien}')
+parser.add_argument('--rgb')
+parser.add_argument('--hex')
+parser.add_argument('--gui', action='store_true')
+args = parser.parse_args()
+
+match args.pattern:
+    case 'horizontal':
+        grid = horizontal()
+    case 'vertical':
+        grid = vertical()
+    case 'radial':
+        grid = radial()
+    case 'alien':
+        grid = alien()
+
+if not (args.grayscale):
     np.around(grid, 0, grid)
 
 # convert grid to 8bit image grayscaled
