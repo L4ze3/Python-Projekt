@@ -4,8 +4,7 @@ import numpy as np
 from PIL import Image
 import gui
 
-
-# TODO: random colors, custom randomness, gui flag, cli interface, convert to ascii
+# TODO: random colors, custom randomness, gui flag, cli interface, convert to ascii, read file + change colors
 
 def upscale(img, scale):
     original_size = img.size  # (width, height)
@@ -51,6 +50,10 @@ parser.add_argument('--hex')
 parser.add_argument('--gui', action='store_true')
 args = parser.parse_args()
 
+if args.gui:
+    app = gui.GUI()
+    app.mainloop()
+
 match args.pattern:
     case 'horizontal':
         grid = horizontal()
@@ -60,6 +63,8 @@ match args.pattern:
         grid = radial()
     case 'alien':
         grid = alien()
+    case _:
+        grid = np.random.rand(8, 8)
 
 if not (args.grayscale):
     np.around(grid, 0, grid)

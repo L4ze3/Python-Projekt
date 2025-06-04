@@ -13,3 +13,27 @@ def color_picker():
         return rgb  
     return None
 
+class GUI(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+        self.title("Python Projekt")
+        self.geometry("400x300")
+
+        selected_option = ctk.StringVar()
+        options = (("Radial", "r"),
+                   ("Vertical", "v"),
+                   ("Horizontal", "h"),
+                   ("Alien", "a"))
+        
+        for option in options:
+            self.radio = ctk.CTkRadioButton(self, text=option[0], value=option[1], variable=selected_option)
+            self.radio.pack(pady=10)
+
+        self.checkbox = ctk.CTkCheckBox(self, text="Grayscale")
+        self.checkbox.pack(pady=10)
+
+        #self.upload_btn = ctk.CTkButton(self, text="Upload", command=self.upload_file)
+        #self.upload_btn.pack(pady=10)
+
+        #self.label = ctk.CTkLabel(self, text="No file selected")
+        #self.label.pack()
