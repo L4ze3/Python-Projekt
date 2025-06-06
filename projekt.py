@@ -3,10 +3,11 @@ import argparse
 import numpy as np
 from PIL import Image
 import gui
+import convert
 #import cli
 #from pattern import *
 
-# TODO: random colors, custom randomness, convert to ascii, read file + change colors, loop generation
+# TODO: (random colors, custom randomness), read file, loop generation
 
 def upscale(img, scale):
     original_size = img.size  # (width, height)
@@ -50,18 +51,25 @@ parser.add_argument('-g', '--grayscale', action='store_true')
 parser.add_argument('-i', '--invert', action='store_true')
 parser.add_argument('-p', '--pattern', help='{(h)orizontal, (v)ertical, (r)adial, (a)lien}')
 parser.add_argument('-c', '--color', default="ffffff")
+parser.add_argument('--name', default="grid.png")
 parser.add_argument('--gui', action='store_true')
+parser.add_argument('--ascii', action='store_true')
 args = parser.parse_args()
 
 grayscale = args.grayscale
 invert = args.invert
 pattern = args.pattern
 color = tuple(int(args.color[i:i+2], 16) for i in (0, 2, 4)) # convert hex to rgb
+name = args.name
+to_ascii = args.ascii
 
-if not grayscale:
+
+if grayscale:
     option = 'g'
-if invert:
+elif invert:
     option = 'i'
+else:
+    option = ''
 
 if args.gui:
     app = gui.GUI()
@@ -83,12 +91,19 @@ match pattern:
     case _:
         grid = np.random.rand(8, 8)
 
+
 if option != 'g':
     np.around(grid, 0, grid)
+    grid = grid.astype(int)
 
 if option == 'i':
     grid = grid.astype(int)
     grid = grid ^ 1
+
+if to_ascii:
+    convert.to_ascii(grid, 'yellow')
+
+###Add color channels###
 
 # convert grid to 8bit image grayscaled
 grid_8bit = (grid * 255).astype(np.uint8)
@@ -107,6 +122,6 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 # Convert to RGB image
 img_colored = Image.fromarray(grid_colored, mode='RGB')
 img_colored = upscale(img_colored, 50)
-img_colored.save(os.path.join(base_dir, 'grid_colored.png'))
+img_colored.save(os.path.join(base_dir, name))
 img_colored.show()
 
