@@ -29,13 +29,6 @@ class GUI(ctk.CTk):
             self.radio_option = ctk.CTkRadioButton(self, text=option[0], value=option[1], variable=self.selected_option)
             self.radio_option.pack(pady=20)
 
-
-        #self.grayscale = ctk.CTkCheckBox(self, text="Grayscale")
-        #self.grayscale.pack(pady=10)
-
-        #self.invert = ctk.CTkCheckBox(self, text="Invert")
-        #self.invert.pack(pady=20)
-
         self.colorpicker = CTkColorPicker(self, orientation='horizontal')
         self.colorpicker.pack(pady=70)
 
