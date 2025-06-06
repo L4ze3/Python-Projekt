@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 import gui
 
-# TODO: random colors, custom randomness, gui flag, cli interface, convert to ascii, read file + change colors
+# TODO: random colors, custom randomness, cli interface, convert to ascii, read file + change colors, add invert
 
 def upscale(img, scale):
     original_size = img.size  # (width, height)
@@ -31,6 +31,7 @@ def horizontal():
     grid = np.concatenate((top_half, bottom_half), axis=0)
     return grid
 
+# WTF
 def alien():
     right_half = np.random.rand(8, 4)
     right_half[3, 2] = 0
@@ -44,37 +45,42 @@ parser = argparse.ArgumentParser(
         )
 
 parser.add_argument('-g', '--grayscale', action='store_true')
-parser.add_argument('-p', '--pattern', help='{horizontal, vertical, radial, alien}')
-parser.add_argument('--rgb')
-parser.add_argument('--hex')
+parser.add_argument('-p', '--pattern', help='{(h)orizontal, (v)ertical, (r)adial, (a)lien}')
+parser.add_argument('-c', '--color')
+parser.add_argument('-i', '--invert', action='store_true')
 parser.add_argument('--gui', action='store_true')
 args = parser.parse_args()
 
 if args.gui:
     app = gui.GUI()
     app.mainloop()
+    values = app.get_values()
+    pattern = values[0]
+    option = values[1]
+    color = values[2]
 
-match args.pattern:
-    case 'horizontal':
+match pattern:
+    case 'h' | 'horizontal':
         grid = horizontal()
-    case 'vertical':
+    case 'v' | 'vertical':
         grid = vertical()
-    case 'radial':
+    case 'r' | 'radial':
         grid = radial()
-    case 'alien':
+    case 'a' | 'alien':
         grid = alien()
     case _:
         grid = np.random.rand(8, 8)
 
-if not (args.grayscale):
+if option != 'g':
     np.around(grid, 0, grid)
+
+if option == 'i':
+    grid = grid.astype(int)
+    grid = grid ^ 1
 
 # convert grid to 8bit image grayscaled
 grid_8bit = (grid * 255).astype(np.uint8)
 img = Image.fromarray(grid_8bit, 'L')
-
-color = gui.color_picker()
-print(color)
 
 # colored bits
 # divide by 255 to get the bit to 1 and multiply by the color rgb code
@@ -91,3 +97,5 @@ img_colored = Image.fromarray(grid_colored, mode='RGB')
 img_colored = upscale(img_colored, 50)
 img_colored.save(os.path.join(base_dir, 'grid_colored.png'))
 img_colored.show()
+
+
